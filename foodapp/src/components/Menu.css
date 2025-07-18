@@ -1,0 +1,11 @@
+.block{
+    display: flex;
+    display: inline-block;
+    
+}
+.image
+{
+    background-size: cover;
+    height: fit-content;
+    width: 200px;
+}

@@ -4,8 +4,21 @@ import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from 'firebase
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField
 } from '@mui/material';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+
 
 function Admin() {
+  const auth = getAuth();
+const [user, setUser] = useState(null);
+
+useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    setUser(currentUser);
+  });
+
+  return () => unsubscribe();
+}, []);
+
   const [foods, setFoods] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
@@ -36,24 +49,34 @@ function Admin() {
 
   // Add new food
   const handleAddFood = async () => {
-    try {
-      await addDoc(collection(db, 'foods'), { ...formData });
-      setFormData({ name: '', price: '', stock: '', category: '', image: '' });
-      fetchFoods();
-    } catch (error) {
-      console.error("Error adding food: ", error);
-    }
-  };
+  if (!user) return alert("Please login to add food.");
+
+  try {
+    await addDoc(collection(db, 'foods'), { ...formData });
+    setFormData({ name: '', price: '', stock: '', category: '', image: '' });
+    fetchFoods();
+  } catch (error) {
+    console.error("Error adding food: ", error);
+  }
+};
+
 
   // Delete food
-  const handleDelete = async (id) => {
-    try {
-      await deleteDoc(doc(db, 'foods', id));
-      fetchFoods();
-    } catch (error) {
-      console.error("Error deleting food: ", error);
-    }
-  };
+  // Delete food
+const handleDelete = async (id) => {
+  if (!user) return alert("Please login to delete items.");
+  const confirmDelete = window.confirm("Are you sure you want to delete this item?");
+  if (!confirmDelete) return;
+
+  try {
+    await deleteDoc(doc(db, 'foods', id));
+    fetchFoods();
+  } catch (error) {
+    console.error("Error deleting food: ", error);
+  }
+};
+
+
 
   // Start edit
   const handleEditClick = (food) => {
@@ -69,16 +92,19 @@ function Admin() {
 
   // Save edited food
   const handleEditSave = async (id) => {
-    try {
-      const docRef = doc(db, 'foods', id);
-      await updateDoc(docRef, { ...formData });
-      setEditingId(null);
-      setFormData({ name: '', price: '', stock: '', category: '', image: '' });
-      fetchFoods();
-    } catch (error) {
-      console.error("Error updating food: ", error);
-    }
-  };
+  if (!user) return alert("Please login to save changes.");
+
+  try {
+    const docRef = doc(db, 'foods', id);
+    await updateDoc(docRef, { ...formData });
+    setEditingId(null);
+    setFormData({ name: '', price: '', stock: '', category: '', image: '' });
+    fetchFoods();
+  } catch (error) {
+    console.error("Error updating food: ", error);
+  }
+};
+
 
   // Handle input changes
   const handleChange = (e) => {

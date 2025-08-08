@@ -1,23 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { db } from '../firebaseConfig';
-import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc, getDoc } from 'firebase/firestore';
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField
 } from '@mui/material';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
-
 function Admin() {
   const auth = getAuth();
-const [user, setUser] = useState(null);
-
-useEffect(() => {
-  const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-    setUser(currentUser);
-  });
-
-  return () => unsubscribe();
-}, []);
+  const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [foods, setFoods] = useState([]);
   const [formData, setFormData] = useState({
@@ -28,6 +21,25 @@ useEffect(() => {
     image: ''
   });
   const [editingId, setEditingId] = useState(null);
+
+  // Check logged-in user & role
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        const userRef = doc(db, 'users', currentUser.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists() && userSnap.data().role === 'admin') {
+          setIsAdmin(true);
+        } else {
+          setIsAdmin(false);
+        }
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   // Fetch foods
   const fetchFoods = async () => {
@@ -49,37 +61,33 @@ useEffect(() => {
 
   // Add new food
   const handleAddFood = async () => {
-  if (!user) return alert("Please login to add food.");
-
-  try {
-    await addDoc(collection(db, 'foods'), { ...formData });
-    setFormData({ name: '', price: '', stock: '', category: '', image: '' });
-    fetchFoods();
-  } catch (error) {
-    console.error("Error adding food: ", error);
-  }
-};
-
+    if (!isAdmin) return alert("You are not authorized to add food.");
+    try {
+      await addDoc(collection(db, 'foods'), { ...formData });
+      setFormData({ name: '', price: '', stock: '', category: '', image: '' });
+      fetchFoods();
+    } catch (error) {
+      console.error("Error adding food: ", error);
+    }
+  };
 
   // Delete food
-  // Delete food
-const handleDelete = async (id) => {
-  if (!user) return alert("Please login to delete items.");
-  const confirmDelete = window.confirm("Are you sure you want to delete this item?");
-  if (!confirmDelete) return;
+  const handleDelete = async (id) => {
+    if (!isAdmin) return alert("You are not authorized to delete items.");
+    const confirmDelete = window.confirm("Are you sure you want to delete this item?");
+    if (!confirmDelete) return;
 
-  try {
-    await deleteDoc(doc(db, 'foods', id));
-    fetchFoods();
-  } catch (error) {
-    console.error("Error deleting food: ", error);
-  }
-};
-
-
+    try {
+      await deleteDoc(doc(db, 'foods', id));
+      fetchFoods();
+    } catch (error) {
+      console.error("Error deleting food: ", error);
+    }
+  };
 
   // Start edit
   const handleEditClick = (food) => {
+    if (!isAdmin) return alert("You are not authorized to edit items.");
     setEditingId(food.id);
     setFormData({
       name: food.name,
@@ -92,24 +100,25 @@ const handleDelete = async (id) => {
 
   // Save edited food
   const handleEditSave = async (id) => {
-  if (!user) return alert("Please login to save changes.");
-
-  try {
-    const docRef = doc(db, 'foods', id);
-    await updateDoc(docRef, { ...formData });
-    setEditingId(null);
-    setFormData({ name: '', price: '', stock: '', category: '', image: '' });
-    fetchFoods();
-  } catch (error) {
-    console.error("Error updating food: ", error);
-  }
-};
-
+    if (!isAdmin) return alert("You are not authorized to save changes.");
+    try {
+      const docRef = doc(db, 'foods', id);
+      await updateDoc(docRef, { ...formData });
+      setEditingId(null);
+      setFormData({ name: '', price: '', stock: '', category: '', image: '' });
+      fetchFoods();
+    } catch (error) {
+      console.error("Error updating food: ", error);
+    }
+  };
 
   // Handle input changes
   const handleChange = (e) => {
     setFormData({...formData, [e.target.name]: e.target.value });
   };
+
+  if (loading) return <p>Loading...</p>;
+  if (!isAdmin) return <p style={{ color: 'red', fontWeight: 'bold' }}>Access Denied: Admins Only</p>;
 
   return (
     <div style={{ padding: '20px' }}>

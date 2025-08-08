@@ -8,6 +8,8 @@ import './Menu.css';
 const Menu = () => {
   const [foods, setFoods] = useState([]); 
   const [cart, setCart] = useState({});
+  const [selectedCategory, setSelectedCategory] = useState("All");
+
 
   const fetchFood = async () => {
     console.log("Fetching foods from Firebase");
@@ -40,33 +42,51 @@ const Menu = () => {
     }
     setCart(newItem);
   };
-
+  
   return (
-    <>
-      <div style={{ marginTop: "70px" }}>
-        {foods.map((item) => (
-          <Card style={{ margin: "10px" }} key={item.id}>
-            <CardContent style={{ display: "flex", justifyContent: "space-between" }}>
-              <div className='block'>
-                <Typography className='fitem'>
-                  <img className='image' src={item.image} alt={item.name} />
-                </Typography>
-                <Typography>{item.name}</Typography>
-                <Typography>{item.price}</Typography>
-                <Typography>{item.stock}</Typography>
-                <Typography>{item.category}</Typography>
+  <>
+    <div className="menu-container">
+      <h1 className="menu-title">Menu</h1>
+      <div className="category-filter">
+      <div className="category-buttons">
+  {["All", "Main course", "Starters", "Desserts", "Beverages"].map((category) => (
+    <Button
+      key={category}
+      variant={selectedCategory === category ? "contained" : "outlined"}
+      color="primary"
+      onClick={() => setSelectedCategory(category)}
+      style={{ margin: "5px" }}
+    >
+      {category}
+    </Button>
+  ))}
+</div>
+
+    </div>
+
+      <div className="food-grid">         
+        {foods.filter((item) => selectedCategory === "All" ? true : item.category === selectedCategory)
+        .map((item) => (
+          <div className="food-card" key={item.id}>
+            <img className="food-image" src={item.image} alt={item.name} />
+            <div className="food-content">
+              <h2 className="food-name">{item.name}</h2>
+              <p className="food-category">Category: {item.category}</p>
+              <p className="food-stock">Stock: {item.stock}</p>
+              <p className="food-price">₹{item.price}</p>
+              <div className="food-actions">
+                <Button variant="contained" color="success" onClick={() => handleAdd(item)}>+</Button>
+                <Button variant="outlined" color="error" onClick={() => handleSub(item)}>-</Button>
               </div>
-              <div>
-                <Button onClick={() => handleAdd(item)}>+</Button>
-                <Button onClick={() => handleSub(item)}>-</Button>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         ))}
       </div>
-      <Cart cart={cart}/>
-    </>
-  );
+    </div>
+    <Cart cart={cart} />
+  </>
+);
+
 }
 
 export default Menu;

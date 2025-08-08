@@ -1,11 +1,102 @@
-.block{
-    display: flex;
-    display: inline-block;
-    
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+  margin: 0;
+  padding: 0;
 }
-.image
-{
-    background-size: cover;
-    height: fit-content;
-    width: 200px;
+
+.menu-container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.menu-title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 30px;
+  color: #333;
+}
+
+.food-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.food-card {
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.food-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.food-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-bottom: 1px solid #eee;
+}
+
+.food-content {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.food-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #222;
+  margin: 0;
+}
+
+.food-category {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.food-stock {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.food-price {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #28a745;
+}
+
+.food-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
+}
+
+@media (max-width: 768px) {
+  .menu-title {
+    font-size: 2rem;
+  }
+}
+.category-buttons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.menu-title {
+  text-align: center;
+  font-size: 2rem;
+  margin-top: 30px;
+  color: #333;
 }

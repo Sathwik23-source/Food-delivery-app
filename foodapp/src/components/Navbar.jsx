@@ -48,7 +48,7 @@ function Navbar () {
     <AppBar>
       <Toolbar style={{ display: "flex", justifyContent: "space-between" }}>
         <Button onClick={()=>navigate('/')} color="white">Food App</Button>
-        <Typography>APP</Typography>
+        <Button onClick={()=>navigate('/')} color="white">Home</Button>
         <div className="clickhome" onClick={()=>navigate(window.location.href="/")}>
 
         </div>

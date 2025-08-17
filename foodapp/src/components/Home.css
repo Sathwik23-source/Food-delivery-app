@@ -1,0 +1,52 @@
+.home {
+  height: 100vh;
+  width: 100%;
+  background-image: url('/backgroundimage.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.home_container {
+  background-color: rgba(0, 0, 0, 0.55); 
+  padding: 40px;
+  border-radius: 16px;
+  max-width: 800px;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+.description h1 {
+  font-size: 3rem;
+  margin-bottom: 10px;
+}
+
+.description h2 {
+  font-size: 2rem;
+  color: #ffc107;
+  margin-bottom: 15px;
+}
+
+.description p {
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+.desc Button {
+  background-color: #ff5722 !important;
+  color: white !important;
+  padding: 12px 24px;
+  font-size: 1rem;
+  border-radius: 8px;
+  transition: background 0.3s ease;
+}
+
+.desc Button:hover {
+  background-color: #e64a19 !important;
+}

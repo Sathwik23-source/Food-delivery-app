@@ -9,15 +9,6 @@ function Home  ()  {
     <div className='home'>
       <div className="home_container">
         <div className="desc">
-          <div>
-            <select name="All Category" id="All Category">
-              <option value="All Category ">All Category</option>
-              <option value="Main course ">Main course</option>
-              <option value="Starters ">Starters</option>
-              <option value="Desserts">Desserts</option>
-              <option value="Beverages">Beverages</option>
-            </select>
-          </div>
           <div className="description">
             <h1>Food delivery in minutes</h1>
             <h2>Order food</h2>

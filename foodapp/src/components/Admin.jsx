@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { db } from '../firebaseConfig';
-import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc, getDoc } from 'firebase/firestore';
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField
 } from '@mui/material';
@@ -28,6 +28,25 @@ useEffect(() => {
     image: ''
   });
   const [editingId, setEditingId] = useState(null);
+
+  // Check logged-in user & role
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        const userRef = doc(db, 'users', currentUser.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists() && userSnap.data().role === 'admin') {
+          setIsAdmin(true);
+        } else {
+          setIsAdmin(false);
+        }
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   // Fetch foods
   const fetchFoods = async () => {
@@ -80,6 +99,7 @@ const handleDelete = async (id) => {
 
   // Start edit
   const handleEditClick = (food) => {
+    if (!isAdmin) return alert("You are not authorized to edit items.");
     setEditingId(food.id);
     setFormData({
       name: food.name,
@@ -110,6 +130,9 @@ const handleDelete = async (id) => {
   const handleChange = (e) => {
     setFormData({...formData, [e.target.name]: e.target.value });
   };
+
+  if (loading) return <p>Loading...</p>;
+  if (!isAdmin) return <p style={{ color: 'red', fontWeight: 'bold' }}>Access Denied: Admins Only</p>;
 
   return (
     <div style={{ padding: '20px' }}>
